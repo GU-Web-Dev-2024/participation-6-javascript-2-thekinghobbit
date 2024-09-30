@@ -56,7 +56,7 @@
 <body>
     <div class="outside-border">
 
-        <h1>Guess the Number (1-10)</h1>
+        <h1>Guess the Number</h1>
 
         <hr>
 
@@ -66,53 +66,85 @@
         </div>
 
         <div>
-            <button id="guess-button" style="width: 200px; font-size: 30px; background-color: red; border-radius: 20px; height: 50px;" >Submit Guess</button>
+            <button id="guess-button" style="width: 200px; font-size: 30px; background-color: red; border-radius: 20px; height: 50px;">Submit Guess</button>
+            <button id="reset-button" style="width: 200px; font-size: 30px; background-color: blue; border-radius: 20px; height: 50px;">Reset Game</button>
         </div>
-
+        
         <div>
             <p id="message"></p>
         </div>
         <hr>
-    </div>
-
-    <script>
-        // JavaScript code goes here   
-        var randomNumber = Math.floor(Math.random() * 10) + 1;
-        var guessInput = document.getElementById('guess-input');
-        var numGuesses = 3; 
-        var guessButton = document.getElementById('guess-button');
-        var message = document.getElementById('message');
-        var totalGuesses = 0;
-
-        guessButton.addEventListener('click', function() {
-            if(numGuesses == 0){
-                message.textContent = 'You have run out of guesses! The number was ' + randomNumber + 
-                                        '.\n Try and guess another number!';
-                randomNumber = Math.floor(Math.random() * 10) + 1;
+        
+        <div>
+            <label for="min-range">Min Range:</label>
+            <input type="number" id="min-range" value="1">
+            <label for="max-range">Max Range:</label>
+            <input type="number" id="max-range" value="10">
+            <button id="set-range-button" style="width: 200px; font-size: 20px; background-color: green; border-radius: 20px; height: 30px;">Set Range</button>
+        </div>
+        
+        <script>
+            var randomNumber;
+            var guessInput = document.getElementById('guess-input');
+            var numGuesses = 3; 
+            var guessButton = document.getElementById('guess-button');
+            var resetButton = document.getElementById('reset-button');
+            var setRangeButton = document.getElementById('set-range-button');
+            var message = document.getElementById('message');
+            var totalGuesses = 0;
+            var minRange = 1;
+            var maxRange = 10;
+        
+            function generateRandomNumber() {
+                randomNumber = Math.floor(Math.random() * (maxRange - minRange + 1)) + minRange;
+            }
+        
+            function resetGame() {
+                generateRandomNumber();
                 numGuesses = 3;
                 totalGuesses = 0;
-                return;
+                message.textContent = '';
+                guessInput.value = '';
             }
-            var guess = parseInt(guessInput.value);
-            totalGuesses++;
-            if (guess > randomNumber) {
-                message.textContent = 'Too High! Try again! You have ' + (numGuesses - 1) + ' guesses left.';
-                numGuesses--;
-            } else if (guess < randomNumber) {
-                message.textContent = 'Too Low! Try again! You have ' + (numGuesses - 1) + ' guesses left.';
-                numGuesses--;
-            }
-            else {
-                message.textContent = 'Congratulations! You guessed the number! The number was ' + randomNumber + 
-                '.\n You got it in ' + totalGuesses + ' guesses! Try and guess another number!';
-                randomNumber = Math.floor(Math.random() * 10) + 1;
-                numGuesses = 3;
-                totalGuesses = 0;
-            }
-        });
-
-
-    </script>
+        
+            generateRandomNumber();
+        
+            guessButton.addEventListener('click', function() {
+                var guess = parseInt(guessInput.value);
+                if (isNaN(guess) || guess < minRange || guess > maxRange) {
+                    message.textContent = 'Please enter a valid number between ' + minRange + ' and ' + maxRange + '.';
+                    return;
+                }
+                totalGuesses++;
+                if (totalGuesses == 3) {
+                    message.textContent = 'You have run out of guesses! The number was ' + randomNumber + '.\n Try and guess another number!';
+                    // resetGame();
+                    return;
+                }
+                if (guess > randomNumber) {
+                    message.textContent = 'Too High! Try again! You have ' + (numGuesses - 1) + ' guesses left.';
+                    numGuesses--;
+                } else if (guess < randomNumber) {
+                    message.textContent = 'Too Low! Try again! You have ' + (numGuesses - 1) + ' guesses left.';
+                    numGuesses--;
+                } else {
+                    message.textContent = 'Congratulations! You guessed the number! The number was ' + randomNumber + '.\n You got it in ' + totalGuesses + ' guesses! Try and guess another number!';
+                    resetGame();
+                }
+            });
+        
+            resetButton.addEventListener('click', resetGame);
+        
+            setRangeButton.addEventListener('click', function() {
+                minRange = parseInt(document.getElementById('min-range').value);
+                maxRange = parseInt(document.getElementById('max-range').value);
+                if (isNaN(minRange) || isNaN(maxRange) || minRange >= maxRange) {
+                    message.textContent = 'Please enter a valid range where Min < Max.';
+                    return;
+                }
+                resetGame();
+            });
+        </script>
 </body>
 
 </html>
